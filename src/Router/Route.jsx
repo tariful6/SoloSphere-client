@@ -1,0 +1,56 @@
+import {createBrowserRouter,} from "react-router-dom";
+import Layout from "../Layouts/Layout";
+import Error from "../Pages/Error/Error";
+import Home from "../Pages/Home/Home";
+import SignIn from "../Pages/Forms/SignIn";
+import SignUp from "../Pages/Forms/SignUp";
+import JobDetails from "../Pages/JobDetails/JobDetails";
+import AddJob from "../Pages/AddJob/AddJob";
+import MyPostedJobs from "../Pages/MyPostedJobs/MyPostedJobs";
+import UpdateJob from "../Pages/UpdateJob/UpdateJob";
+
+
+
+const myRouter = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout></Layout>,
+    errorElement : <Error></Error>,
+    children : [
+      {
+        path : '/',
+        element : <Home></Home>,
+      },
+      {
+        path : 'signIn',
+        element : <SignIn></SignIn>
+      },
+      {
+        path : 'signUp',
+        element : <SignUp></SignUp>
+      },
+      {
+        path : 'addJob',
+        element : <AddJob></AddJob>
+      },
+      {
+        path : 'myPostedJobs',
+        element : <MyPostedJobs></MyPostedJobs>
+      },
+      {
+        path : 'updateJob/:id',
+        element : <UpdateJob></UpdateJob>,
+        loader : ({params}) => fetch(`http://localhost:5000/jobs/${params.id}`)
+      },
+      {
+        path : 'jobDetails/:id',
+        element : <JobDetails></JobDetails>,
+        loader : ({params}) => fetch(`http://localhost:5000/jobs/${params.id}`)
+        
+      },
+    ]
+  },
+]);
+export default myRouter
+
+//  console.log(import.meta.env.VITE_API_URL);
