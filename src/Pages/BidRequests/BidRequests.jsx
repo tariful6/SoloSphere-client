@@ -1,32 +1,70 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../../Provider/AuthProvider";
-import axios from "axios";
+// import axios from "axios";
 import RequestRow from "./RequestRow";
+import { useMutation, useQuery, useQueryClient, } from "@tanstack/react-query";
+import useAxiosSecure from "../../hook/useAxiosSecure";
 
 const BidRequests = () => {
-    const [bids, setBids] = useState([])
-    const [control, setControl] = useState(false);
+    const axiosSecure = useAxiosSecure()
+    // const [bids, setBids] = useState([])
+    // const [control, setControl] = useState(false);
     const {user} = useContext(AuthContext)
-    console.log(user.email);
-   
+    // console.log(user.email);
+    const queryClient = useQueryClient();
+    
+    // tanstack query use ---- for get data we use -- useQuery only.
+    const {data : bids = [], isLoading, refetch} = useQuery({
+        queryFn : ()=> getData(),
+        queryKey : ['bids' , user?.email]
+    })
+    // console.log(bids);                                                              
 
-    useEffect(()=>{
-       axios.get(`http://localhost:5000/bidRequest/${user?.email}`)
-       .then(data => setBids(data.data))
-    },[user, control])
-
-
-
-    const handleUpdateStatus = (id, prevStatus, status) =>{
-        if(prevStatus === status) return alert('sorry')
-        console.log(id, prevStatus, status)
-        axios.patch(`http://localhost:5000/bid/${id}`, {status})
-        .then(data => {
-            console.log(data.data)
-            setControl(!control)
-        })
+    const getData = async () => {
+        const {data} = await axiosSecure(`/bidRequest/${user?.email}`)
+        return data
     }
-     
+
+    // here we use tanstack query thats why we comment it -------------
+    // useEffect(()=>{
+    //    axios.get(`http://localhost:5000/bidRequest/${user?.email}`)
+    //    .then(data => setBids(data.data))
+    // },[user, control])
+
+
+
+   // tanstack query use ---- for update data we use -- useMutation only.
+   const { mutateAsync } = useMutation({
+       mutationFn : async ({id, status})=> {
+          const {data} = await axiosSecure.patch(`/bid/${id}`, {status})
+          console.log(data);
+       },
+        onSuccess : ()=> {
+            alert('successfully update')
+            // refetch() // invalidateQueries is a advance alternative of refetch. 
+            queryClient.invalidateQueries({queryKey:['bids']})
+        }
+   })
+
+    const handleUpdateStatus = async (id, prevStatus, status) =>{
+        if(prevStatus === status) return alert('sorry')     
+        await mutateAsync({id, status})
+    }
+
+
+    // const handleUpdateStatus = (id, prevStatus, status) =>{
+    //     if(prevStatus === status) return alert('sorry')
+    //     console.log(id, prevStatus, status)
+    //     axiosSecure.patch(`/bid/${id}`, {status})
+    //     .then(data => {
+    //         console.log(data.data)
+    //         setControl(!control)
+    //     })
+    // }
+
+
+    if(isLoading) return <p className=" text-red-500">Data is still Loading........</p> 
+
 
     return (
         <div>

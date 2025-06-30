@@ -2,17 +2,19 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../Provider/AuthProvider";
 import BidsRow from "./BidsRow";
+import useAxiosSecure from "../../hook/useAxiosSecure";
 
 
 const MyBids = () => {
    const [jobs, setJobs] = useState([])
    const [control, setControl] = useState(false);
    const {user} = useContext(AuthContext)
+   const axiosSecure = useAxiosSecure();
 
     useEffect(()=>{
-       axios.get(`http://localhost:5000/myBids/${user?.email}`)
+      axiosSecure(`/myBids/${user?.email}` )
        .then(data => setJobs(data.data))
-    },[user, control])
+    },[user, control, axiosSecure])
      console.log(jobs);
 
 
