@@ -22,7 +22,7 @@ const JobDetails = () => {
         if(price < parseFloat(min_price)) return alert('offer more')
         const comment = form.comment.value;
         const email = form.email.value;
-        const buyer_email = buyer.email;
+        // const buyer_email = buyer.email;
         const status = 'Pending';
         const deadline = startDate;
 
@@ -35,7 +35,7 @@ const JobDetails = () => {
             category,
             status,
             email,
-            buyer_email
+            buyer
         }
         axios.post('http://localhost:5000/bid', bidData)
         .then(data => {

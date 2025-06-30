@@ -1,32 +1,53 @@
-import { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Provider/AuthProvider";
+import axios from "axios";
 
 const SignIn = () => {
-        const {signInUser , googleSignIn} = useContext(AuthContext);
+        const {signInUser , googleSignIn, user, loading} = useContext(AuthContext);
         const navigate = useNavigate();
+        const location = useLocation();
+        const from =location.state || '/';
+
+        useEffect(()=>{
+            if(user){
+                navigate('/')
+            }
+        },[navigate, user])
     
         const handleSignIn = async e => {
         e.preventDefault();
         const form = e.target;
         const email = form.email.value;
         const password = form.password.value;
-        try{
-          const result = await signInUser(email, password)
-          console.log(result);
-          alert('user successfully created')
-          navigate('/')
-        }catch (err) {console.log(err)}
+        signInUser(email, password)
+        .then(result => {
+            console.log(result);
+            axios.post('http://localhost:5000/jwt', {email : result?.user?.email}, {withCredentials : true})
+           .then(data => console.log(data))
+            navigate(from, { replace : true})
+            alert('user successfully created')
+        })
+        .catch(err => console.log(err))
+        //   axios.post('http://localhost:5000/jwt', {email : result?.user?.email})
+        //   .then(data => console.log(data))
+        
     }
 
     const handleGoogleSignIn = () => {
         googleSignIn()
         .then(data => {
-            console.log(data.user);
+            console.log(data.user.email);
+            axios.post('http://localhost:5000/jwt', {email : data?.user?.email}, {withCredentials : true})
+           .then(data => console.log(data))
             navigate('/')
         })
         .catch(err => console.log(err))
     }
+
+
+
+    if(user || loading) return;
     return (
         <div className='flex justify-center items-center min-h-[calc(100vh-306px)]'>
             <div className='flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg  lg:max-w-4xl '>

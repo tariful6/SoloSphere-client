@@ -5,9 +5,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import { AuthContext } from "../../Provider/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import useAuth from "../../hook/useAuth";
 const AddJob = () => {
     const [startDate, setStartDate] = useState(new Date());
-    const {user} = useContext(AuthContext);
+    // const {user} = useContext(AuthContext);
+    const {user} = useAuth();
     const navigate = useNavigate();
 
     const handleAddJob = e => {

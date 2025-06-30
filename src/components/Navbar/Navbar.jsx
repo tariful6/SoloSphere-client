@@ -6,7 +6,7 @@ import { AuthContext } from '../../Provider/AuthProvider';
 const Navbar = () => {
     const {user, logOut} = useContext(AuthContext);
 
-    const handleGoogle = () => {
+    const handleLogOut = () => {
         logOut()
         .then(()=> {})
         .catch(err => console.log(err))
@@ -53,10 +53,10 @@ const Navbar = () => {
                     >
                        <li><Link to='/addJob'><div>Add Job</div></Link></li>
                        <li><Link to='/myPostedJobs'><div>My Posted Jobs</div></Link></li>
-                       <li><Link to='/'><div>My Bids</div></Link></li>
-                       <li><Link to='/'><div>Bid Requests</div></Link></li>
+                       <li><Link to='/myBids'><div>My Bids</div></Link></li>
+                       <li><Link to='/bidRequest'><div>Bid Requests</div></Link></li>
                         <li className='mt-2'>
-                          <button onClick={handleGoogle} className='bg-gray-200 block text-center'>Logout</button>
+                          <button onClick={handleLogOut} className='bg-gray-200 block text-center'>Logout</button>
                         </li>
                     </ul>
                     </div>

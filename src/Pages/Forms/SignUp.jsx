@@ -1,10 +1,14 @@
 import { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Provider/AuthProvider";
+import axios from "axios";
 
 const SignUp = () => {
     const {createUser, updateUserProfile, setUser, user} = useContext(AuthContext)
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from =location.state || '/';
+    
     const handleSignUp = async e => {
         e.preventDefault();
         const form = e.target;
@@ -14,11 +18,15 @@ const SignUp = () => {
         const password = form.password.value;
         try{
           const result = await createUser(email, password)
-          console.log(result);
            await  updateUserProfile(name, photo)
-           setUser({...user, photoURL : photo, displayName : name})
+        //    setUser({...user, photoURL : photo, displayName : name})
+           setUser({...result?.user, photoURL : photo, displayName : name})
+                   
+            axios.post('http://localhost:5000/jwt', {email : result?.user?.email}, {withCredentials : true})
+           .then(data => console.log(data))
+
            alert('user successfully created')
-           navigate('/')
+            navigate(from, { replace : true})
 
         }catch (err) {console.log(err)}
         

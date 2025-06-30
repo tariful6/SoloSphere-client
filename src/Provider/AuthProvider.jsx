@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 import auth from "../firebase/firebase.config";
+import axios from "axios";
 
 export const AuthContext = createContext(null);
 const googleProvider = new GoogleAuthProvider();
@@ -33,6 +34,12 @@ const AuthProvider = ({children}) => {
 
     const logOut = () => {
         setLoading(true);
+        axios.get('http://localhost:5000/logout', {withCredentials: true})
+        .then(data => {
+            console.log(data);
+            
+        })
+
         return signOut(auth)
     }
 

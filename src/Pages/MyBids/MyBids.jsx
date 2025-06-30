@@ -1,57 +1,38 @@
+import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../Provider/AuthProvider";
-import axios from "axios";
-import JobRow from "./JobRow";
-import useAxiosSecure from "../../hook/useAxiosSecure";
+import BidsRow from "./BidsRow";
 
-const MyPostedJobs = () => {
-    const {user} = useContext(AuthContext);
-    const [jobs, setJobs] = useState([]);
-    const [control, setControl] = useState(false);
-    const axiosSecure = useAxiosSecure();
 
-    // useEffect(()=>{
-    //     const getData = async () => {
-    //         const {data} = await axios(`http://localhost:5000/job/${user.email}`)
-    //         setJobs(data)
-    //     }    
-    //    getData()
-    // },[user])
-
-    
-    
-    // useEffect(()=>{
-    //         fetch(`http://localhost:5000/job/${user?.email}`)
-    //         .then(res => res.json())
-    //         .then(data => setJobs(data))
-    //     },[user])
+const MyBids = () => {
+   const [jobs, setJobs] = useState([])
+   const [control, setControl] = useState(false);
+   const {user} = useContext(AuthContext)
 
     useEffect(()=>{
-       axiosSecure(`/job/${user?.email}`)
+       axios.get(`http://localhost:5000/myBids/${user?.email}`)
        .then(data => setJobs(data.data))
-    },[user, control, axiosSecure])
-    console.log(jobs);
-    
-        
-        const handleDelete = id =>{
-        // console.log(id);  
-        axiosSecure.delete(`/job/${id}`)
-        .then(data => {
-            if(data.data.deletedCount > 0){
-                alert('deleted')
-                setControl(!control)
-            }
-        })
-       
-    }
+    },[user, control])
+     console.log(jobs);
 
+
+     const handleStatus = (id) => {
+        console.log(id);
+        axios.patch(`http://localhost:5000/bid/${id}`, {status : 'Complete'})
+        .then(data => {
+            console.log(data.data)
+            setControl(!control)
+        })
+        
+     }
+    
     return (
         <section className='container px-4 mx-auto pt-12'>
             <div className='flex items-center gap-x-3'>
-                <h2 className='text-lg font-medium text-gray-800 '>My Posted Jobs</h2>
+                <h2 className='text-lg font-medium text-gray-800 '>My Bids</h2>
 
                 <span className='px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full '>
-                {jobs.length} Job
+               {jobs.length} Bid
                 </span>
             </div>
 
@@ -83,7 +64,7 @@ const MyPostedJobs = () => {
                             className='px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500'
                             >
                             <button className='flex items-center gap-x-2'>
-                                <span>Price Range</span>
+                                <span>Price</span>
                             </button>
                             </th>
 
@@ -93,21 +74,22 @@ const MyPostedJobs = () => {
                             >
                             Category
                             </th>
+
                             <th
                             scope='col'
                             className='px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500'
                             >
-                            Description
+                            Status
                             </th>
 
                             <th className='px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500'>
-                            Edit
+                            Actions
                             </th>
                         </tr>
                         </thead>
                         <tbody className='bg-white divide-y divide-gray-200 '>
                             {
-                                jobs.map(job => <JobRow key={job._id} job={job} handleDelete={handleDelete}></JobRow>)
+                                jobs.map(job => <BidsRow key={job._id} job={job} handleStatus={handleStatus}></BidsRow>)
                             }
                         </tbody>
                     </table>
@@ -119,4 +101,4 @@ const MyPostedJobs = () => {
     );
 };
 
-export default MyPostedJobs;
+export default MyBids;
